@@ -1,6 +1,7 @@
 class Student:
-    def __init__(self, name: str) -> None:
+    def __init__(self, name: str, rating: str) -> None:
         self.__name: str = name
+        self.__rating: str = rating
 
     @property
     def name(self) -> str:
@@ -9,6 +10,14 @@ class Student:
     @name.setter
     def name(self, name: str) -> None:
         self.__name = name
+
+    @property
+    def rating(self) -> str:
+        return self.__rating
+
+    @rating.setter
+    def rating(self, rating: str) -> None:
+        self.__rating = rating
 
 
 class StudentService:
@@ -50,6 +59,10 @@ class Faculty:
     @property
     def students(self) -> list[Student]:
         return self.__students
+    
+    @name.setter
+    def name(self, name: str) -> None:
+        self.__name = name
 
     @program.setter
     def program(self, program: str) -> None:
@@ -77,19 +90,22 @@ class FacultyService:
 
     def find_faculty(self, name: str) -> Faculty:
         return self.__faculties.get(name)
+    
+    def get_all(self) -> dict[str, Faculty]:
+        return self.__faculties
 
 
 class University:
-    def __init__(self, title: str, faculties: list[Faculty] = None) -> None:
+    def __init__(self, title: str, faculties: dict[str, Faculty] = None) -> None:
         self.__title: str = title
-        self.__faculties: list[Faculty] = faculties or []
+        self.__faculties: dict[str, Faculty] = faculties or {}
 
     @property
     def title(self) -> str:
         return self.__title
 
     @property
-    def faculties(self) -> list[Faculty]:
+    def faculties(self) -> dict[str, Faculty]:
         return self.__faculties
 
     @title.setter
@@ -97,7 +113,7 @@ class University:
         self.__title = title
 
     @faculties.setter
-    def faculties(self, faculties: list[Faculty]) -> None:
+    def faculties(self, faculties: dict[str, Faculty]) -> None:
         self.__faculties = faculties
 
 
@@ -118,3 +134,13 @@ class UniversityService:
 
     def find_university(self, title: str) -> University:
         return self.__universities.get(title)
+    
+    def edit_university(self, university: University) -> bool:
+        if university.title not in self.__universities:
+            return False
+        
+        self.__universities[university.title] = university
+        return True
+
+    def get_all(self) -> dict[str, University]:
+        return self.__universities

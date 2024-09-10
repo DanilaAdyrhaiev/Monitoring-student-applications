@@ -3,6 +3,7 @@ import openpyxl
 from education import UniversityService, Faculty, Student
 from openpyxl.styles import Alignment
 
+#Запис у ексель-таблиці
 class ExcelWriter:
     def __init__(self, university_service: UniversityService):
         self.university_service = university_service
@@ -16,7 +17,7 @@ class ExcelWriter:
             workbook = openpyxl.load_workbook(filename)
 
         universities = self.university_service.get_all()
-        all_students = set()  # Инициализация множества для хранения всех уникальных студентов
+        all_students = {}  # Используем словарь для хранения студентов и их баллов
 
         for university_name, university in universities.items():
             for faculty_name, faculty in university.faculties.items():
@@ -59,11 +60,11 @@ class ExcelWriter:
                     sheet.cell(row=row, column=2, value=student.name)
                     sheet.cell(row=row, column=3, value=student.rating)
                     row += 1
-                    all_students.add(student.name)  # Добавление студента в множество
+                    all_students[student.name] = student.rating  # Добавление студента и его балла в словарь
 
         # Создание сводного листа для заявок
         summary_sheet = workbook.create_sheet(title="Applications")
-        col = 2  # Столбец для университетов, факультетов и программ
+        col = 3  # Столбец для университетов, факультетов и программ
         faculties_info = []
 
         # Заголовок для университетов
@@ -87,16 +88,21 @@ class ExcelWriter:
                 # Переход к следующему столбцу для следующего факультета
                 col += 1
 
-        # Запись всех уникальных студентов в первый столбец начиная с 4-го ряда
-        all_students = sorted(all_students)  # Сортировка студентов для упорядоченного отображения
+        # Заголовки для ФИО и Баллов
+        summary_sheet.cell(row=3, column=1, value="ФИО")
+        summary_sheet.cell(row=3, column=2, value="Балл")
+
+        # Запись всех уникальных студентов и их баллов начиная с 4-го ряда
+        all_students = dict(sorted(all_students.items()))  # Сортировка студентов для упорядоченного отображения
         row = 4
-        for student_name in all_students:
+        for student_name, student_rating in all_students.items():
             summary_sheet.cell(row=row, column=1, value=student_name)
+            summary_sheet.cell(row=row, column=2, value=student_rating)
             row += 1
 
         # Заполнение плюсов и минусов
         for i, student_name in enumerate(all_students, start=4):
-            for j, (_, _, faculty) in enumerate(faculties_info, start=2):
+            for j, (_, _, faculty) in enumerate(faculties_info, start=3):
                 if any(student.name == student_name for student in faculty.students):
                     summary_sheet.cell(row=i, column=j, value="+").alignment = Alignment(horizontal="center")
                 else:

@@ -10,6 +10,7 @@ from education import University, Faculty, Student
 
 univerService = UniversityService()
 
+#Отримування інформації про університети та студентів
 def getUniversityTitle(response: requests.models.Response) -> str:
     soup = BeautifulSoup(response.text, 'html.parser')
     return soup.find('h2').get_text(strip=True)
@@ -29,7 +30,7 @@ def getStudents(response: requests.models.Response) -> list:
     driver.get(response.url)
     while True:
         try:
-            detail_link = WebDriverWait(driver, 1).until(
+            detail_link = WebDriverWait(driver, 2).until(
                 EC.element_to_be_clickable((By.XPATH, "//div[@class='detail-link']"))
             )
             driver.execute_script("arguments[0].click();", detail_link)

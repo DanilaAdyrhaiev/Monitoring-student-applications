@@ -10,7 +10,6 @@ from education import University, Faculty, Student
 
 univerService = UniversityService()
 
-#Отримування інформації про університети та студентів
 def getUniversityTitle(response: requests.models.Response) -> str:
     soup = BeautifulSoup(response.text, 'html.parser')
     return soup.find('h2').get_text(strip=True)
@@ -54,7 +53,6 @@ def getStudents(response: requests.models.Response) -> list:
 def createFaculty(response: requests.models.Response) -> Faculty:
     university_title = getUniversityTitle(response)
     university = univerService.find_university(university_title)
-    #используем количество факультетов
     if university:
         number_of_faculties = len(university.faculties)
     else:
